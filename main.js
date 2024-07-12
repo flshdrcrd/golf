@@ -74,8 +74,8 @@ setLegend(
 3..............3`],
 )
 
-power = 0
-angle = 0
+let power = 0
+let angle = 0
 
 setSolids([])
 
@@ -84,13 +84,13 @@ setBackground(background)
 let level = 0
 const levels = [
   map`
-t...............
-o...............
 ................
 ................
 ................
 ................
-.......h........
+................
+................
+....o.....h.....
 ................
 ................
 ................
@@ -113,16 +113,31 @@ onInput("s", () => {
 })
 
 onInput("a", () => {
-  angle -= 1;
+  angle -= 10;
 })
 
 onInput("d", () => {
-  angle += 1;
+  angle += 10;
 })
 
 onInput("j", () => {
-  getFirst(ball).x = xcoord;
-  getFirst(ball).y = ycoord;
+  let path = [];
+  for (let i = 1; i <= power; i++) {
+    path.push(getCoordinates(angle, i));
+  }
+
+  let i = 0;
+  const interval = setInterval(() => {
+    if (i < path.length) {
+      const [x, y] = path[i];
+      getFirst(ball).x = x;
+      getFirst(ball).y = y;
+      i++;
+    } else {
+      clearInterval(interval);
+    }
+  }, 50);
+
 })
 
 afterInput(() => {
@@ -155,7 +170,9 @@ afterInput(() => {
     y: 2,
     color: color`L`
   })
+});
 
+function getCoordinates(angle, power) {
   const currentx = getFirst(ball).x;
   const currenty = getFirst(ball).y;
 
@@ -166,28 +183,23 @@ afterInput(() => {
   xcoord = Math.round(currentx + (power * sin));
   ycoord = Math.round(currenty + (power * cos));
 
-  if (xcoord > width()) {
-    xcoord = 2 * width() - xcoord
+  while ((xcoord > width() - 1) || (xcoord < 0)) {
+    if (xcoord > width() - 1) {
+      xcoord = 2 * (width() - 1) - xcoord
+    }
+    if (xcoord < 0) {
+      xcoord = -xcoord
+    }
   }
 
-  if (xcoord < 0) {
-    xcoord = -xcoord
+  while ((ycoord > height() - 1) || (ycoord < 0)) {
+    if (ycoord > height() - 1) {
+      ycoord = 2 * (height() - 1) - ycoord
+    }
+    if (ycoord < 0) {
+      ycoord = -ycoord
+    }
   }
 
-  if (ycoord > width()) {
-    ycoord = 2 * width() - ycoord
-  }
-
-  if (ycoord < 0) {
-    ycoord = -xcoord
-  }
-
-  addText(`${xcoord} ${ycoord}`, {
-    x: 1,
-    y: 3,
-    color: color`L`
-  });
-
-  getFirst(target).x = xcoord;
-  getFirst(target).y = ycoord;
-});
+  return [xcoord, ycoord]
+}
