@@ -1,7 +1,6 @@
 const ball = "o"
 const hole = "h"
 const background = 'b'
-const target = "t"
 
 setLegend(
   [ball, bitmap`
@@ -55,34 +54,33 @@ setLegend(
 4444444444444444
 4444444444444444
 4444444444444444`],
-  [target, bitmap`
-3..............3
-.3............3.
-..3..........3..
-...3........3...
-....3......3....
-.....3....3.....
-......3..3......
-.......33.......
-.......33.......
-......3..3......
-.....3....3.....
-....3......3....
-...3........3...
-..3..........3..
-.3............3.
-3..............3`],
 )
-
-let power = 0
-let angle = 0
-
-setSolids([])
 
 setBackground(background)
 
-let level = 0
 const levels = [
+  map`
+............................
+............................
+............................
+............................
+............................
+............................
+............................
+............................
+............................
+............................
+............................
+............................
+............................
+............................
+............................
+............................
+............................
+............................
+............................
+............................
+............................`,
   map`
 ............................
 ............................
@@ -107,86 +105,101 @@ const levels = [
 ............................`
 ]
 
-setMap(levels[level])
-reset()
-xcoord = null;
-ycoord = null;
+level = 1;
+
+reset();
+mainMenu();
 
 onInput("w", () => {
-  power += 1;
+  if (level == 1) {
+    power += 1;
+  }
 })
 
 onInput("s", () => {
-  power -= 1;
+  if (level == 1) {
+    power -= 1;
+  }
 })
 
 onInput("a", () => {
-  angle -= 10;
+  if (level == 1) {
+    angle -= 10;
+  }
 })
 
 onInput("d", () => {
-  angle += 10;
+  if (level == 1) {
+    angle += 10;
+  }
 })
 
 onInput("j", () => {
-  let path = [];
-  for (let i = 1; i <= power; i++) {
-    path.push(getCoordinates(angle, i));
-  }
-
-  let i = 0;
-  const interval = setInterval(() => {
-    if (i < path.length) {
-      const [x, y] = path[i];
-      getFirst(ball).x = x;
-      getFirst(ball).y = y;
-      i++;
-    } else {
-      clearInterval(interval);
-      const ballx = getFirst(ball).x;
-      const bally = getFirst(ball).y;
-      const holex = getFirst(hole).x;
-      const holey = getFirst(hole).y;
-
-      if ((ballx === holex) && (bally === holey)) {
-        win()
-      }
+  if (level == 1) {
+    let path = [];
+    for (let i = 1; i <= power; i++) {
+      path.push(getCoordinates(angle, i));
     }
-  }, 50);
 
+    let i = 0;
+    const interval = setInterval(() => {
+      if (i < path.length) {
+        const [x, y] = path[i];
+        getFirst(ball).x = x;
+        getFirst(ball).y = y;
+        i++;
+      } else {
+        clearInterval(interval);
+        const ballx = getFirst(ball).x;
+        const bally = getFirst(ball).y;
+        const holex = getFirst(hole).x;
+        const holey = getFirst(hole).y;
 
+        if ((ballx === holex) && (bally === holey)) {
+          win()
+        }
+      }
+    }, 50);
+  }
+})
+
+onInput("k", () => {
+  mainMenu();
 })
 
 afterInput(() => {
-  clearText();
+  if (level == 1) {
+    clearText();
+    if (power < 0) {
+      power = 0
+    }
 
-  if (power < 0) {
-    power = 0
+    if (power > 100) {
+      power = 100
+    }
+
+    if (angle < 0) {
+      angle = 360
+    }
+
+    if (angle > 360) {
+      angle = 0
+    }
+
+    addText(`power: ${power}`, {
+      x: 1,
+      y: 1,
+      color: color`L`
+    })
+
+    addText(`angle: ${angle}`, {
+      x: 1,
+      y: 2,
+      color: color`L`
+    })
+  } else {
+    mainMenu();
   }
-
-  if (power > 100) {
-    power = 100
-  }
-
-  if (angle < 0) {
-    angle = 360
-  }
-
-  if (angle > 360) {
-    angle = 0
-  }
-
-  addText(`power: ${power}`, {
-    x: 1,
-    y: 1,
-    color: color`L`
-  })
-
-  addText(`angle: ${angle}`, {
-    x: 1,
-    y: 2,
-    color: color`L`
-  })
 });
 
 function getCoordinates(angle, power) {
@@ -222,7 +235,11 @@ function getCoordinates(angle, power) {
 }
 
 function reset() {
-  setMap(levels[level]);
+  level = 1;
+  setMap(levels[level])
+  clearText();
+  power = 0
+  angle = 0
   getFirst(ball).x = Math.floor(Math.random() * width());
   getFirst(ball).y = Math.floor(Math.random() * height());
   getFirst(hole).x = Math.floor(Math.random() * width());
@@ -233,7 +250,24 @@ function win() {
   reset();
   addText(`You win!`, {
     x: 1,
-    y: 3,
+    y: 13,
     color: color`L`
   });
+}
+
+function mainMenu() {
+  if (level == 0) {
+    reset();
+  } else {
+    clearText();
+    addText(" - - GOLF - - ", { x: 3, y: 3, color: color`L` });
+    addText("W/S: power", { x: 5, y: 6, color: color`L` });
+    addText("A/D: angle", { x: 5, y: 7, color: color`L` });
+    addText("J:   shoot", { x: 5, y: 8, color: color`L` });
+    addText("K:   exit", { x: 5, y: 9, color: color`L` });
+    addText("PRESS ANY KEY ", { x: 4, y: 12, color: color`L` });
+    addText("TO CONTINUE", { x: 5, y: 13, color: color`L` });
+    level = 0
+    setMap(levels[level])
+  }
 }
