@@ -1,13 +1,7 @@
-const ball = `o`
-const hole = `h`
-const background = `b`
+const ball = `o`, hole = `h`, background = `b`;
+let level = 0, power = 0, angle = 0, shots = 0, round = 1, results = [];
 
-shots = 0;
-round = 1;
-results = [];
-
-setLegend(
-  [ball, bitmap`
+setLegend([ball, bitmap`
 ................
 ................
 .....222222.....
@@ -23,8 +17,7 @@ setLegend(
 ...2222222222...
 .....222222.....
 ................
-................`],
-  [hole, bitmap`
+................`], [hole, bitmap`
 ....00000000....
 ...0000000000...
 ..000000000000..
@@ -40,8 +33,7 @@ setLegend(
 .00000000000000.
 ..000000000000..
 ...0000000000...
-....00000000....`],
-  [background, bitmap`
+....00000000....`], [background, bitmap`
 4444444444444444
 4444444444444444
 4444444444444444
@@ -57,13 +49,10 @@ setLegend(
 4444444444444444
 4444444444444444
 4444444444444444
-4444444444444444`],
-)
+4444444444444444`]);
+setBackground(background);
 
-setBackground(background)
-
-const levels = [
-  map`
+const levels = [map`
 ............................
 ............................
 ............................
@@ -84,8 +73,7 @@ const levels = [
 ............................
 ............................
 ............................
-............................`,
-  map`
+............................`, map`
 ............................
 ............................
 ............................
@@ -106,34 +94,53 @@ const levels = [
 ............................
 ............................
 ............................
-............................`
-]
-
+............................`, map`
+............................
+............................
+............................
+............................
+............................
+............................
+............................
+............................
+............................
+............................
+............................
+............................
+............................
+............................
+............................
+............................
+............................
+............................
+............................
+............................
+............................`];
 mainMenu();
 
 onInput(`w`, () => {
   if (level == 1) {
-    power += 1;
+    power = Math.min(power + 1, 100);
   }
-})
+});
 
 onInput(`s`, () => {
   if (level == 1) {
-    power -= 1;
+    power = Math.max(power - 1, 0);
   }
-})
+});
 
 onInput(`a`, () => {
   if (level == 1) {
-    angle -= 10;
+    angle = (angle - 5 + 360) % 360;
   }
-})
+});
 
 onInput(`d`, () => {
   if (level == 1) {
-    angle += 10;
+    angle = (angle + 5) % 360;
   }
-})
+});
 
 onInput(`j`, () => {
   if (level == 1) {
@@ -156,48 +163,22 @@ onInput(`j`, () => {
         const holex = getFirst(hole).x;
         const holey = getFirst(hole).y;
         if ((ballx === holex) && (bally === holey)) {
-          score()
+          score();
         }
       }
     }, 50);
   }
-})
+});
 
 afterInput(() => {
   if (level == 1) {
     clearText();
-    if (power < 0) {
-      power = 0
-    }
-    if (power > 100) {
-      power = 100
-    }
-    if (angle < 0) {
-      angle = 350
-    }
-    if (angle >= 360) {
-      angle = 0
-    }
-    addText(`power: ${power}`, {
-      x: 1,
-      y: 1,
-      color: color`L`
-    })
-    addText(`angle: ${angle}`, {
-      x: 1,
-      y: 2,
-      color: color`L`
-    })
-    addText(`${shots}`, {
-      x: 1,
-      y: 14,
-      color: color`L`
-    });
-    addText(`${round}/18`, {
-      x: 15,
-      y: 14,
-      color: color`L`
-    });
+    addText(`power: ${power}`, { x: 1, y: 1, color: color`L` });
+    addText(`angle: ${angle}`, { x: 1, y: 2, color: color`L` });
+    addText(`${shots}`, { x: 1, y: 14, color: color`L` });
+    addText(`${round}/18`, { x: 15, y: 14, color: color`L` });
+  } else if (level == 2) {
+    mainMenu();
   } else {
     reset();
   }
@@ -208,38 +189,38 @@ function getCoordinates(angle, power) {
   const currenty = getFirst(ball).y;
 
   const radians = angle * Math.PI / 180;
-  const sin = Math.sin(radians)
-  const cos = Math.cos(radians)
+  const sin = Math.sin(radians);
+  const cos = Math.cos(radians);
 
-  xcoord = Math.round(currentx + (power * sin));
-  ycoord = Math.round(currenty + (power * cos));
+  let xcoord = Math.round(currentx + (power * sin));
+  let ycoord = Math.round(currenty + (power * cos));
 
   while ((xcoord > width() - 1) || (xcoord < 0)) {
     if (xcoord > width() - 1) {
-      xcoord = 2 * (width() - 1) - xcoord
+      xcoord = 2 * (width() - 1) - xcoord;
     }
     if (xcoord < 0) {
-      xcoord = -xcoord
+      xcoord = -xcoord;
     }
   }
 
   while ((ycoord > height() - 1) || (ycoord < 0)) {
     if (ycoord > height() - 1) {
-      ycoord = 2 * (height() - 1) - ycoord
+      ycoord = 2 * (height() - 1) - ycoord;
     }
     if (ycoord < 0) {
-      ycoord = -ycoord
+      ycoord = -ycoord;
     }
   }
-  return [xcoord, ycoord]
+  return [xcoord, ycoord];
 }
 
 function reset() {
   level = 1;
-  setMap(levels[level])
+  setMap(levels[level]);
   clearText();
-  power = 0
-  angle = 0
+  power = 0;
+  angle = 0;
   getFirst(ball).x = Math.floor(Math.random() * width());
   getFirst(ball).y = Math.floor(Math.random() * height());
   getFirst(hole).x = Math.floor(Math.random() * width());
@@ -264,8 +245,11 @@ function mainMenu() {
   addText(`J:   shoot`, { x: 5, y: 8, color: color`L` });
   addText(`PRESS ANY KEY `, { x: 4, y: 12, color: color`L` });
   addText(`TO CONTINUE`, { x: 5, y: 13, color: color`L` });
-  level = 0
-  setMap(levels[level])
+  level = 0;
+  setMap(levels[level]);
+  shots = 0;
+  round = 1;
+  results = [];
 }
 
 function end() {
@@ -289,9 +273,6 @@ function end() {
   addText(`16. ${results[15]}`, { x: 11, y: 12, color: color`L` });
   addText(`17. ${results[16]}`, { x: 11, y: 13, color: color`L` });
   addText(`18. ${results[17]}`, { x: 11, y: 14, color: color`L` });
-  level = 0
-  setMap(levels[level])
-  shots = 0;
-  round = 1;
-  results = [];
+  level = 2;
+  setMap(levels[level]);
 }
