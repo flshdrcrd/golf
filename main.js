@@ -1,6 +1,10 @@
-const ball = "o"
-const hole = "h"
-const background = 'b'
+const ball = `o`
+const hole = `h`
+const background = `b`
+
+shots = 0;
+round = 1;
+results = [];
 
 setLegend(
   [ball, bitmap`
@@ -105,42 +109,39 @@ const levels = [
 ............................`
 ]
 
-level = 1;
-
-reset();
 mainMenu();
 
-onInput("w", () => {
+onInput(`w`, () => {
   if (level == 1) {
     power += 1;
   }
 })
 
-onInput("s", () => {
+onInput(`s`, () => {
   if (level == 1) {
     power -= 1;
   }
 })
 
-onInput("a", () => {
+onInput(`a`, () => {
   if (level == 1) {
     angle -= 10;
   }
 })
 
-onInput("d", () => {
+onInput(`d`, () => {
   if (level == 1) {
     angle += 10;
   }
 })
 
-onInput("j", () => {
+onInput(`j`, () => {
   if (level == 1) {
+    shots += 1;
     let path = [];
     for (let i = 1; i <= power; i++) {
       path.push(getCoordinates(angle, i));
     }
-
     let i = 0;
     const interval = setInterval(() => {
       if (i < path.length) {
@@ -154,17 +155,12 @@ onInput("j", () => {
         const bally = getFirst(ball).y;
         const holex = getFirst(hole).x;
         const holey = getFirst(hole).y;
-
         if ((ballx === holex) && (bally === holey)) {
-          win()
+          score()
         }
       }
     }, 50);
   }
-})
-
-onInput("k", () => {
-  mainMenu();
 })
 
 afterInput(() => {
@@ -173,32 +169,37 @@ afterInput(() => {
     if (power < 0) {
       power = 0
     }
-
     if (power > 100) {
       power = 100
     }
-
     if (angle < 0) {
-      angle = 360
+      angle = 350
     }
-
-    if (angle > 360) {
+    if (angle >= 360) {
       angle = 0
     }
-
     addText(`power: ${power}`, {
       x: 1,
       y: 1,
       color: color`L`
     })
-
     addText(`angle: ${angle}`, {
       x: 1,
       y: 2,
       color: color`L`
     })
+    addText(`${shots}`, {
+      x: 1,
+      y: 14,
+      color: color`L`
+    });
+    addText(`${round}/18`, {
+      x: 15,
+      y: 14,
+      color: color`L`
+    });
   } else {
-    mainMenu();
+    reset();
   }
 });
 
@@ -230,7 +231,6 @@ function getCoordinates(angle, power) {
       ycoord = -ycoord
     }
   }
-
   return [xcoord, ycoord]
 }
 
@@ -246,28 +246,52 @@ function reset() {
   getFirst(hole).y = Math.floor(Math.random() * height());
 }
 
-function win() {
+function score() {
+  results.push(shots);
+  shots = 0;
   reset();
-  addText(`You win!`, {
-    x: 1,
-    y: 13,
-    color: color`L`
-  });
+  if (round == 18) {
+    end();
+  }
+  round += 1;
 }
 
 function mainMenu() {
-  if (level == 0) {
-    reset();
-  } else {
-    clearText();
-    addText(" - - GOLF - - ", { x: 3, y: 3, color: color`L` });
-    addText("W/S: power", { x: 5, y: 6, color: color`L` });
-    addText("A/D: angle", { x: 5, y: 7, color: color`L` });
-    addText("J:   shoot", { x: 5, y: 8, color: color`L` });
-    addText("K:   exit", { x: 5, y: 9, color: color`L` });
-    addText("PRESS ANY KEY ", { x: 4, y: 12, color: color`L` });
-    addText("TO CONTINUE", { x: 5, y: 13, color: color`L` });
-    level = 0
-    setMap(levels[level])
-  }
+  clearText();
+  addText(` - - GOLF - - `, { x: 3, y: 3, color: color`L` });
+  addText(`W/S: power`, { x: 5, y: 6, color: color`L` });
+  addText(`A/D: angle`, { x: 5, y: 7, color: color`L` });
+  addText(`J:   shoot`, { x: 5, y: 8, color: color`L` });
+  addText(`PRESS ANY KEY `, { x: 4, y: 12, color: color`L` });
+  addText(`TO CONTINUE`, { x: 5, y: 13, color: color`L` });
+  level = 0
+  setMap(levels[level])
+}
+
+function end() {
+  clearText();
+  addText(`- - RESULTS - -`, { x: 3, y: 3, color: color`L` });
+  addText(`1. ${results[0]}`, { x: 4, y: 6, color: color`L` });
+  addText(`2. ${results[1]}`, { x: 4, y: 7, color: color`L` });
+  addText(`3. ${results[2]}`, { x: 4, y: 8, color: color`L` });
+  addText(`4. ${results[3]}`, { x: 4, y: 9, color: color`L` });
+  addText(`5. ${results[4]}`, { x: 4, y: 10, color: color`L` });
+  addText(`6. ${results[5]}`, { x: 4, y: 11, color: color`L` });
+  addText(`7. ${results[6]}`, { x: 4, y: 12, color: color`L` });
+  addText(`8. ${results[7]}`, { x: 4, y: 13, color: color`L` });
+  addText(`9. ${results[8]}`, { x: 4, y: 14, color: color`L` });
+  addText(`10. ${results[9]}`, { x: 11, y: 6, color: color`L` });
+  addText(`11. ${results[10]}`, { x: 11, y: 7, color: color`L` });
+  addText(`12. ${results[11]}`, { x: 11, y: 8, color: color`L` });
+  addText(`13. ${results[12]}`, { x: 11, y: 9, color: color`L` });
+  addText(`14. ${results[13]}`, { x: 11, y: 10, color: color`L` });
+  addText(`15. ${results[14]}`, { x: 11, y: 11, color: color`L` });
+  addText(`16. ${results[15]}`, { x: 11, y: 12, color: color`L` });
+  addText(`17. ${results[16]}`, { x: 11, y: 13, color: color`L` });
+  addText(`18. ${results[17]}`, { x: 11, y: 14, color: color`L` });
+  level = 0
+  setMap(levels[level])
+  shots = 0;
+  round = 1;
+  results = [];
 }
